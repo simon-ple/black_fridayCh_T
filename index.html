@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black Friday Widget</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            /* White background */
+            background-color: #ffffff; 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 12px;
+            color: #0f172a; /* Slate 900 for main text */
+        }
+        .btn-market {
+            background-color: #f1f5f9; /* Slate 100 */
+            border: 1px solid #cbd5e1; /* Slate 300 */
+            color: #475569; /* Slate 600 */
+            transition: all 0.2s;
+        }
+        .btn-market:hover {
+            background-color: #e2e8f0; /* Slate 200 */
+            color: #0f172a;
+        }
+        /* Active state with gold/yellow accent */
+        .btn-market.active {
+            background-color: #ca8a04;
+            border-color: #ca8a04;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .card-section {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0; /* Slate 200 */
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Subtle shadow for depth on white */
+        }
+        .label {
+            color: #64748b; /* Slate 500 */
+            font-size: 0.70rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+        .value {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0f172a; /* Slate 900 */
+        }
+        .accent-text {
+            color: #ca8a04; /* Gold/Yellow */
+        }
+        /* Hide element utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="mb-4">
+            <h2 class="text-lg font-bold text-slate-900 tracking-wide uppercase">
+                Black <span class="accent-text">Friday</span>
+            </h2>
+            <p class="text-xs text-slate-500">Select a market to view offers and delivery</p>
+        </div>
+
+        <!-- Market Selector Buttons -->
+        <div id="btn-container" class="flex flex-wrap gap-2 mb-4">
+            <!-- Buttons injected by JS -->
+        </div>
+
+        <!-- Content Display Area -->
+        <div id="content-container" class="hidden">
+            <!-- Delivery Card -->
+            <div id="delivery-container" class="card-section">
+                <div class="flex items-center gap-2 mb-2 border-b border-slate-200 pb-2">
+                    <svg class="w-4 h-4 accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                    <h3 class="font-bold text-sm text-slate-800">Delivery Updates</h3>
+                </div>
+                <div id="delivery-info" class="text-xs text-slate-600 leading-relaxed space-y-1">
+                    <!-- Delivery Info injected by JS -->
+                </div>
+            </div>
+
+            <!-- Offer Details Card -->
+            <div class="card-section relative overflow-hidden">
+                <div class="flex items-center gap-2 mb-3 border-b border-slate-200 pb-2">
+                    <svg class="w-4 h-4 accent-text" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="font-bold text-sm text-slate-800">Offer Details</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 gap-2">
+                    <div>
+                        <div class="label">Headline Offer</div>
+                        <div id="headline" class="value accent-text text-base"></div>
+                    </div>
+                    
+                    <div id="shirt-container">
+                        <div class="label">Shirt Multi-buy</div>
+                        <div id="shirt" class="value"></div>
+                    </div>
+                    
+                    <div id="non-shirt-container">
+                        <div class="label">Non-Shirt Discount</div>
+                        <div id="non-shirt" class="value"></div>
+                    </div>
+                    
+                    <div>
+                        <div class="label">Acquisition Offer</div>
+                        <div id="acquisition" class="value"></div>
+                    </div>
+                    
+                    <div class="pt-2 mt-1 border-t border-slate-200">
+                        <div class="label">Price Driven By</div>
+                        <div id="price-driven" class="text-xs font-mono text-slate-600 bg-slate-100 inline-block px-2 py-1 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data for all markets
+        const marketData = {
+            "UK": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 7-9 days (from 5).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong class=\"text-red-600\">Unavailable:</strong> Next Day, Express, & Click & Collect.",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "Up to 50% off",
+                shirt: "4 for £119",
+                nonShirt: "25% off suits + 20% off everything else",
+                acquisition: "£29.95 per shirt + 20% off",
+                priceDriven: "Price file"
+            },
+            "US": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 12-14 days (from 8-10).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong class=\"text-red-600\">Unavailable:</strong> Priority, Express.",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "4 for $179 + 30% off everything else",
+                shirt: "4 for $179",
+                nonShirt: "30%",
+                acquisition: "$44.95 per shirt + 30% off everything else + free shipping",
+                priceDriven: "Price file"
+            },
+            "AUS": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 12-16 days (from 8-12).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong class=\"text-red-600\">Unavailable:</strong> Express.",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "4 for $199 + 25% off everything else",
+                shirt: "4 for $199",
+                nonShirt: "25%",
+                acquisition: "$49.95 per shirt + 25% off everything else",
+                priceDriven: "Price file"
+            },
+            "DE": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 10-12 days (from 6-8).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong class=\"text-red-600\">Unavailable:</strong> Express.",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "Up to 50% off",
+                shirt: "4 for €149",
+                nonShirt: "25% off everything else",
+                acquisition: "€39.95 per shirt + 25% off + free delivery",
+                priceDriven: "Price file EU"
+            },
+            "FR": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 11 days (from 7).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "Up to 50% off",
+                shirt: "4 for €149",
+                nonShirt: "20% off everything else",
+                acquisition: "€39.95 per shirt + 20% off + free delivery",
+                priceDriven: "Price file"
+            },
+            "CAN": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 12-14 days (from 8-10).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong class=\"text-red-600\">Unavailable:</strong> Priority.",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "4 for $279 + 25% off everything else",
+                shirt: "4 for $279",
+                nonShirt: "25% off everything else",
+                acquisition: "$69.95 per shirt + 25% off + free shipping",
+                priceDriven: "Price file"
+            },
+            "CH": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 11 days (from 7).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "Up to 50% off",
+                shirt: "4 for CHF 159",
+                nonShirt: "20% off everything else",
+                acquisition: "CHF 39 per shirt + 25% off + free delivery",
+                priceDriven: "Price file"
+            },
+            "NL": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> 11 days (from 7).",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "Up to 50% off",
+                shirt: "4 for €149",
+                nonShirt: "20% off everything else",
+                acquisition: "€39.95 per shirt + 20% off + free delivery",
+                priceDriven: "Price file EU"
+            },
+            "EU": {
+                delivery: [
+                    "<strong>Delivery timeframe:</strong> Assume standard extensions apply.",
+                    "<strong>Standard Delivery:</strong> <span class=\"text-green-600 font-semibold\">Available</span> (Extended Nov 19 - Dec 4).",
+                    "<strong>Alterations:</strong> Lead time +10 days."
+                ],
+                headline: "Up to 50% off",
+                shirt: "4 for €149",
+                nonShirt: "20% off everything else",
+                acquisition: "€39.95 per shirt + 20% off + free delivery",
+                priceDriven: "Price file EU"
+            },
+            "XBR": {
+                delivery: null, // Global-e manages shipping, hides section
+                headline: "25% off everything",
+                shirt: null,
+                nonShirt: null,
+                acquisition: "25% off everything",
+                priceDriven: "Offer code"
+            }
+        };
+
+        const btnContainer = document.getElementById('btn-container');
+        const contentContainer = document.getElementById('content-container');
+        let currentActiveBtn = null;
+
+        // Initialize widget
+        function init() {
+            // Generate Buttons
+            Object.keys(marketData).forEach(market => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-market text-xs py-1.5 px-3 rounded font-medium cursor-pointer';
+                btn.textContent = market;
+                btn.onclick = () => selectMarket(market, btn);
+                btnContainer.appendChild(btn);
+            });
+
+            // Auto-select first market (UK) on load
+            const firstBtn = btnContainer.firstElementChild;
+            selectMarket('UK', firstBtn);
+        }
+
+        // Handle market selection
+        function selectMarket(market, btnElement) {
+            // Manage active states
+            if (currentActiveBtn) {
+                currentActiveBtn.classList.remove('active');
+            }
+            btnElement.classList.add('active');
+            currentActiveBtn = btnElement;
+
+            // Fetch data
+            const data = marketData[market];
+
+            // Populate Delivery
+            const deliveryContainer = document.getElementById('delivery-container');
+            const deliveryEl = document.getElementById('delivery-info');
+            
+            if (data.delivery) {
+                deliveryContainer.classList.remove('hidden');
+                deliveryEl.innerHTML = data.delivery.map(line => `<p class="mb-1.5">› ${line}</p>`).join('');
+            } else {
+                deliveryContainer.classList.add('hidden');
+            }
+
+            // Populate Offers
+            document.getElementById('headline').textContent = data.headline;
+            
+            // Handle optional fields (like XBR which doesn't have shirt/non-shirt splits)
+            const shirtContainer = document.getElementById('shirt-container');
+            if (data.shirt) {
+                shirtContainer.classList.remove('hidden');
+                document.getElementById('shirt').textContent = data.shirt;
+            } else {
+                shirtContainer.classList.add('hidden');
+            }
+
+            const nonShirtContainer = document.getElementById('non-shirt-container');
+            if (data.nonShirt) {
+                nonShirtContainer.classList.remove('hidden');
+                document.getElementById('non-shirt').textContent = data.nonShirt;
+            } else {
+                nonShirtContainer.classList.add('hidden');
+            }
+
+            document.getElementById('acquisition').textContent = data.acquisition;
+            document.getElementById('price-driven').textContent = data.priceDriven.toUpperCase();
+
+            // Show content (useful for initial load)
+            contentContainer.classList.remove('hidden');
+        }
+
+        // Run initialization
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
