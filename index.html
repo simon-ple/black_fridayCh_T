@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Black Friday Widget</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Canvas Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -276,6 +278,11 @@
 
         // Handle market selection
         function selectMarket(market, btnElement) {
+            // Trigger falling coins animation if the button wasn't already active
+            if (currentActiveBtn !== btnElement) {
+                fireCoins(btnElement);
+            }
+
             // Manage active states
             if (currentActiveBtn) {
                 currentActiveBtn.classList.remove('active');
@@ -322,6 +329,26 @@
 
             // Show content (useful for initial load)
             contentContainer.classList.remove('hidden');
+        }
+
+        // Function to trigger the falling coins animation
+        function fireCoins(btnElement) {
+            // Get button position to fire from
+            const rect = btnElement.getBoundingClientRect();
+            // Calculate relative X and Y positions (0 to 1 scale for canvas-confetti)
+            const xPos = (rect.left + (rect.width / 2)) / window.innerWidth;
+            const yPos = (rect.top + (rect.height / 2)) / window.innerHeight;
+
+            confetti({
+                particleCount: 40,
+                spread: 70,
+                origin: { x: xPos, y: yPos },
+                colors: ['#eab308', '#ca8a04', '#a16207', '#fef08a'], // Gold/Yellow shades
+                shapes: ['circle'],
+                scalar: 1.2, // Slightly larger particles
+                gravity: 1.5, // Fall a bit faster like heavy coins
+                ticks: 200 // Last slightly longer on screen
+            });
         }
 
         // Run initialization
