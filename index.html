@@ -270,10 +270,6 @@
                 btn.onclick = () => selectMarket(market, btn);
                 btnContainer.appendChild(btn);
             });
-
-            // Auto-select first market (UK) on load
-            const firstBtn = btnContainer.firstElementChild;
-            selectMarket('UK', firstBtn);
         }
 
         // Handle market selection
